@@ -1,0 +1,48 @@
+Pure-FTPd Mysql based Virtual Directories
+-----------------------------------------
+
+We needed to have the ability to create "Symlink like" Virtual Directories in Pure-FTPd without allowing access to the entire file structure outside of the users FTP root.
+
+An example Directory structure that we needed to simulate was:
+
+What the FTP Client Sees -> What the actual filesystem is
+/ftp_root/user1/         -> /ftp_root/user1/ 
+/ftp_root/user1/incoming -> /nfs1/incoming/user1/
+/ftp_root/user1/outgoing -> /nfs2/outgoing/user1/
+
+Pure-FTPd has two features that made adding our feature a much easier task.
+It has the ability to enable a Fake/Virtual Chroot, which in simple terms allows access outside of the normal chroot, but without the user knowing it so that symlinks are accessible.
+The other feature that it has is the ability to use MySQL as a backend for storing/managing user accounts.
+
+Our patches allow you to create a MySQL table that stores an alias to real file path mapping. 
+This allows us to manage these Virtual Directories via our standard MySQL integration.
+ 
+These patches are in the standard FreeBSD port format and can easily be compiled into Pure-FTPd on any current FreeBSD machine by adding the files in the 
+/usr/ports/ftp/pure-ftpd/files/ directory.
+
+Inorder to make use of the functionality you need to enable both of the following settings:
+MYSQL=on "Support for users in MySQL database"
+VIRTUALCHROOT=on (default) "Follow symlinks outside a chroot jail" 
+
+Once that is done its as simple as adding a MySQL table with three columns
+User,Virtual_Name,Virtual_Base
+
+An example query is provided as a patch to the pureftpd-mysql.conf
+
+----------------------------------------
+Caution!
+----------------------------------------
+This project is still in an Alpha status and not feature complete or ready for full production use yet. Any help smoothing out the edges and adding additional features / functions would be greatly appreciated!
+
+
+How to Contribute
+----------------------------------------
+You're interested in contributing to this project? Sweet!
+
+fork pure-ftpd-getvirtualdirs from here: http://github.com/wayfair/pure-ftpd-getvirtualdirs
+
+Clone your fork
+Hackit up
+Push the branch up to GitHub
+Send a pull request to the wayfair/pure-ftpd-getvirtualdirs project.
+We'll do our best to get your changes in as soon as possible!
