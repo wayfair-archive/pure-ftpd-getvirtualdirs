@@ -1,0 +1,28 @@
+--- configure.orig	2011-11-01 11:31:07.000000000 -0400
++++ configure	2011-11-18 11:30:02.000000000 -0500
+@@ -1344,6 +1344,8 @@
+   --with-virtualhosts     Handle virtual servers on different IP addresses
+   --with-virtualchroot    Enable the ability to follow symlinks outside a
+                           chroot jail
++  --with-virtualdirs      Enable the ability to provide paths a user can follow
++                          outside a chroot jail without a symlink present
+   --with-diraliases       Enable directory aliases
+   --with-nonroot          Compile a limited server designed to be started as a
+                           regular user. Only enable this option as a last
+@@ -15140,6 +15142,16 @@
+   fi
+ fi
+ 
++# Check whether --with-virtualdirs was given.
++if test "${with_virtualdirs+set}" = set; then
++  withval=$with_virtualdirs;  if test "x$withval" = "xyes" ; then
++
++cat >>confdefs.h <<\_ACEOF
++#define WITH_VIRTUALDIRS
++_ACEOF
++
++  fi
++fi
+ 
+ 
+ # Check whether --with-diraliases was given.

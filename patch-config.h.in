@@ -1,0 +1,12 @@
+--- config.h.in.orig	2011-11-21 16:30:18.000000000 -0500
++++ config.h.in	2011-11-21 16:29:38.000000000 -0500
+@@ -869,6 +869,9 @@
+ /* with virtual chroot */
+ #undef WITH_VIRTUAL_CHROOT
+ 
++/* with virtual directories */
++#undef WITH_VIRTUALDIRS
++
+ /* with virtualhosts */
+ #undef WITH_VIRTUAL_HOSTS
+ 
