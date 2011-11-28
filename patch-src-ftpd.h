@@ -1,9 +1,10 @@
---- src/ftpd.h.orig	2011-10-31 11:55:57.000000000 -0400
-+++ src/ftpd.h	2011-11-16 15:51:03.000000000 -0500
-@@ -777,4 +777,14 @@
+--- src/ftpd.h.orig 2011-10-31 11:55:57.000000000 -0400
++++ src/ftpd.h	2011-11-18 09:38:30.000000000 -0500
+@@ -777,4 +777,16 @@
  #include "bsd-realpath.h"    
  #include "fakechroot.h"
          
++#ifdef WITH_VIRTUALDIRS
 +typedef struct {
 +    char *virtualdir_base;
 +    char *virtualdir_name;
@@ -13,5 +14,6 @@
 +
 +virtualdir_info **virtualdirs;
 +int num_virtualdirs;
++#endif
 +
  #endif
