@@ -1,17 +1,10 @@
---- src/log_mysql.c.orig	2011-10-30 18:20:17.000000000 -0400
-+++ src/log_mysql.c	2011-11-16 15:37:20.000000000 -0500
-@@ -8,7 +8,6 @@
- # include "log_mysql.h"
- # include "messages.h"
- # include "crypto.h"
--# include "alt_arc4random.h"
- 
- # ifdef WITH_DMALLOC
- #  include <dmalloc.h>
-@@ -295,6 +294,62 @@
+--- src/log_mysql.c.orig 2011-10-30 18:20:17.000000000 -0400
++++ src/log_mysql.c	2011-11-22 09:18:20.000000000 -0500
+@@ -295,6 +295,66 @@
      return answer;    
  }
  
++#ifdef WITH_VIRTUALDIRS
 +void pw_mysql_virtualdirquery(MYSQL * const id_sql_server,
 +			    const char * const orig_query,
 +			    const char * const account,
@@ -26,19 +19,19 @@
 +    int i;
 +    unsigned long *lengths;
 +    MYSQL_ROW row;
-+    MYSQL_RES *virtualdir_res;
++    MYSQL_RES *virtualdir_res = NULL;
 +    size_t length1, length2;
 +
 +    if (orig_query == NULL || *orig_query == 0) {
-+	return;
++	goto bye;
 +    }
 +    if (sqlsubst(orig_query, query, sizeof query,
 +		account, ip, port, peer_ip, decimal_ip) == NULL) {
-+	return;
++	goto bye;
 +    }
 +    if (mysql_real_query(id_sql_server, query, strlen(query)) != 0) {
 +	logfile(LOG_WARNING, MSG_SQL_WRONG_PARMS " : [%s]", query);
-+	return;
++	goto bye;
 +    }
 +
 +    virtualdir_res = mysql_store_result(id_sql_server);
@@ -63,24 +56,35 @@
 +            die_mem();
 +        }
 +    }
-+
-+    mysql_free_result(virtualdir_res);
++    bye:
++    if (virtualdir_res != NULL) {
++        mysql_free_result(virtualdir_res);
++    }
 +    return;
 +}
++#endif
 +
  void pw_mysql_check(AuthResult * const result,
                      const char *account, const char *password,
                      const struct sockaddr_storage * const sa,
-@@ -413,6 +468,12 @@
+@@ -413,6 +473,12 @@
                                   escaped_decimal_ip)) == NULL) {
          goto bye;
      }
-+
++#ifdef WITH_VIRTUALDIRS
 +    pw_mysql_virtualdirquery(id_sql_server, sql_getvirtualdirs,
 +				escaped_account, escaped_ip,
 +				escaped_port, escaped_peer_ip,
 +				escaped_decimal_ip);
-+
++#endif
      result->auth_ok--;                  /* -1 */
      if (strcasecmp(crypto, PASSWD_SQL_ANY) == 0) {
          crypto_crypt++;
+@@ -674,6 +740,7 @@
+     ZFREE(sqlreq_getgid);
+     ZFREE(sql_default_gid);
+     ZFREE(sqlreq_getdir);
++    ZFREE(sql_getvirtualdirs);
+ #ifdef QUOTAS
+     ZFREE(sqlreq_getqta_fs);
+     ZFREE(sqlreq_getqta_sz);
